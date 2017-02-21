@@ -1,0 +1,21 @@
+package rover.command;
+
+public class LoggingCommand implements RoverCommand {
+
+     private static final Logger LOGGER = LoggerFactory.getLogger(LoggingCommand.class);
+    private RoverCommand currentCommand;
+
+    public LoggingCommand(RoverCommand command) {
+        this.currentCommand = command;
+    }
+
+    public void execute() {
+        currentCommand.execute();
+        LOGGER.info(currentCommand.toString());
+    }
+ 
+    @Override
+    public String toString() {
+        return currentCommand.toString();
+    }
+ }

@@ -1,0 +1,139 @@
+package rover.programmable;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+import rover.Point;
+import rover.command.LandCommand;
+import rover.command.LiftCommand;
+import rover.command.MoveCommand;
+import rover.command.RoverCommand;
+import rover.command.TurnCommand;
+import rover.constants.Direction;
+
+ public class RoverCommandParser {
+    private ProgrammableRover rover;
+    private RoverProgram program;
+    private String path;
+
+    public RoverCommandParser(ProgrammableRover rover, String path) {
+        this.rover = rover;
+        this.path = path;
+        program = new RoverProgram();
+    }
+
+    public RoverProgram getProgram() throws RoverCommandParserException {
+
+        String s;
+        boolean isConfig = true;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(this.getClass().getResource(path).getFile()));
+            RoverCommand command;
+
+            while ((s = reader.readLine()) != null) {
+                if (isConfig) {
+                    if (!s.equals(RoverProgram.SEPARATOR)) {
+                        retrieveConfig(s);
+                    }
+                    else {
+                        isConfig = false;
+                    }
+                }
+                else {
+                    command = retrieveCommand(s);
+                    if ((boolean) program.getSettings().get(RoverProgram.LOG)) {
+                        program.commands.add(new LoggingCommand(command));
+                    }
+                    else {
+                        program.commands.add(command);
+                    }
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            throw new RoverCommandParserException();
+        } catch (RuntimeException e) {
+            throw new RoverCommandParserException();
+        }
+        return program;
+    }
+
+    private Direction parseDirection(String s) {
+        Direction direction = Direction.SOUTH;
+        switch (s.toLowerCase()) {
+            case "east": {
+                direction = Direction.EAST;
+                break;
+            }
+            case "west": {
+                direction = Direction.WEST;
+                break;
+            }
+            case "north": {
+                direction = Direction.NORTH;
+                break;
+            }
+            case "south": {
+                direction = Direction.SOUTH;
+                break;
+            }
+        }
+        return direction;
+    }
+
+    private Point parsePoint(String x, String y) {
+        Point point = new Point(0, 0);
+        point.setX(Integer.parseInt(x)); 
+        point.setY(Integer.parseInt(y));
+
+        return point;
+    }
+
+    private void retrieveConfig(String s) {
+        switch(s) {
+            case RoverProgram.LOG  " on": {
+                program.settings.put(RoverProgram.LOG, true);
+                break;
+            }
+            case RoverProgram.LOG  " off": {
+                program.settings.put(RoverProgram.LOG, false);
+                break;
+            }
+            case RoverProgram.STATS  " on": {
+                program.settings.put(RoverProgram.STATS, true);
+                break;
+            }
+            case RoverProgram.STATS  " off": {
+                program.settings.put(RoverProgram.STATS, false);
+                break;
+            }
+        }
+    }
+    
+    private RoverCommand retrieveCommand(String s) {
+        String[] splitted = s.split(" ");
+        RoverCommand command = null;
+ 
+        switch(splitted[0]) {
+            case "move": {
+                command = new MoveCommand(this.rover);
+                break;
+            }
+            case "turn": {
+                command = new TurnCommand(this.rover, parseDirection(splitted[1]));
+                break;
+            }
+            case "lift" : {
+                command = new LiftCommand((this.rover));
+                break;
+            }
+            case "land" : {
+                command = new LandCommand(this.rover, parsePoint(splitted[1], splitted[2]),
+                        parseDirection(splitted[3]));
+                break;
+            }
+        }
+        return command;
+    }
+ }

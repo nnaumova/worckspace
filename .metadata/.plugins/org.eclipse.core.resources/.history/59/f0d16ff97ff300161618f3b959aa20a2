@@ -1,0 +1,29 @@
+package rover.command;
+
+import rover.Rover;
+
+public class MoveCommand implements RoverCommand {
+	Rover rover;
+
+	public MoveCommand(Rover rover) {
+		this.rover = rover;
+	}
+
+	public void execute() {
+		rover.move();
+	}
+
+	@Override
+	public String toString() {
+		return "Rover moved";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof MoveCommand)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}

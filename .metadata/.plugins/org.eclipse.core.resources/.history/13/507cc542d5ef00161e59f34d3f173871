@@ -1,0 +1,57 @@
+package rover;
+
+import rover.constants.Direction;
+
+public class Rover implements Moveable, Turnable, Liftable, Landable {
+
+	private Point roverPosition;
+	private Direction roverDirection;
+
+	Rover() {
+		roverPosition = new Point(0, 0);
+		roverDirection = Direction.SOUTH;
+	}
+
+	@Override
+	public void land(Point position, Direction direction) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void lift() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void turnTo(Direction direction) {
+		roverDirection = direction;
+
+	}
+
+	@Override
+	public void move() {
+		int x = roverPosition.getX();
+		int y = roverPosition.getY();
+
+		switch (roverDirection) {
+		case SOUTH:
+			y++;
+			break;
+		case NORTH:
+			y--;
+			break;
+		case WEST:
+			x--;
+			break;
+		case EAST:
+			x++;
+			break;
+
+		}
+		roverPosition.setPoint(x, y);
+
+	}
+
+}
